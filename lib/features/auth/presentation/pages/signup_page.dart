@@ -2,22 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
-import '../../../core/di/service_locator.dart';
+import '../../../../core/di/service_locator.dart';
 import '../blocs/auth_cubit.dart';
 
-class LoginPage extends StatefulWidget {
+class SignupPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _SignupPageState createState() => _SignupPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _fullNameController;
   late final TextEditingController _emailController;
   late final TextEditingController _passwordController;
 
   @override
   void initState() {
+    _fullNameController = TextEditingController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     super.initState();
@@ -25,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void dispose() {
+    _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -36,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
       create: (context) => sl<AuthCubit>(),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Login'),
+          title: const Text('Signup'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -45,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
               if (state.isLoaded) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Welcome ${state.user?.name}'),
+                    content: Text('Welcome ${state.user?.fullName}'),
                   ),
                 );
               } else if (state.isError) {
@@ -61,10 +63,12 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  _buildEmailFullnameField(),
+                  const SizedBox(height: 16.0),
                   _buildEmailField(),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   _buildPasswordField(),
-                  SizedBox(height: 16.0),
+                  const SizedBox(height: 16.0),
                   _buildLoginButton(),
                 ],
               ),
@@ -72,6 +76,22 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildEmailFullnameField() {
+    return TextFormField(
+      controller: _fullNameController,
+      decoration: InputDecoration(
+        labelText: 'Full Name',
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter your full name';
+        }
+        return null;
+      },
     );
   }
 
@@ -118,10 +138,13 @@ class _LoginPageState extends State<LoginPage> {
         return ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              cubit.login(_emailController.text, _passwordController.text);
+              cubit.login(
+                _emailController.text,
+                _passwordController.text,
+              );
             }
           },
-          child: Text(state.isLoading ? "Loading" : 'Login'),
+          child: Text(state.isLoading ? "Loading" : 'Signup'),
         );
       },
     );

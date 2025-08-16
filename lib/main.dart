@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'auth/presentation/pages/login_page.dart';
 import 'core/di/service_locator.dart';
+import 'features/auth/presentation/pages/login_page.dart';
 
 void main() {
   initServiceLocator();
